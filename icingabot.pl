@@ -35,6 +35,9 @@ my $inputFile = '/tmp/icingaBot';
 my $fileSuffix = '.tmp';
 my $copyFile = $inputFile.$fileSuffix;
 
+# Nombre de seconde pour actualiser les alertes
+my $refresh = 5;
+
 ####################################
 # Overriding Bot::BasicBot methods #
 ####################################
@@ -50,7 +53,7 @@ sub connected {
 sub tick {
         my ($self) = @_;
         readInputFile($self);
-        return 5; # This method will be re-executed in 5 second
+        return $refresh; # This method will be re-executed in $refresh second
 }
 
 ################
@@ -75,8 +78,8 @@ sub readInputFile {
                    or warn $! ? "Error closing sort pipe: $!"
                         : "Exit status $? from sort";
                 unlink $copyFile;
-        } else {
-                print "Fichier $inputFile introuvable";        
+        #} else {
+        #        print "Fichier $inputFile introuvable\n";        
         }
 }
 
