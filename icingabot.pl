@@ -49,10 +49,7 @@ sub connected {
 
 sub tick {
         my ($self) = @_;
-        $self->say(
-                channel=>$channel,
-                body=>"I'am still here !",
-        );
+        readInputFile($self);
         return 5; # This method will be re-executed in 5 second
 }
 
@@ -61,17 +58,26 @@ sub tick {
 ################
 
 sub readInputFile {
-        move($inputFile, $copyFile) or die "Move failed!"; 
-        open(FILE, '<:encoding(UTF-8)', $copyFile)
-          or die "Couldn't open file $inputFile !";
+        my ($bot) = @_;
+        if (-e $inputFile) {
+                move($inputFile, $copyFile) or die "Move failed!"; 
+                open(FILE, '<:encoding(UTF-8)', $copyFile)
+                 or die "Couldn't open file $copyFile !";
 
-        while (my $line = <FILE>) {
-                
+                while (my $line = <FILE>) {
+                        $bot->say(
+                                channel=>$channel,
+                                body=>$line,
+                                );
+                }
+
+                close FILE
+                   or warn $! ? "Error closing sort pipe: $!"
+                        : "Exit status $? from sort";
+                unlink $copyFile;
+        } else {
+                print "Fichier $inputFile introuvable";        
         }
-
-        close FILE
-          or warn $! ? "Error closing sort pipe: $!"
-                : "Exit status $? from sort";        
 }
 
 #########################
