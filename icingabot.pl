@@ -7,12 +7,11 @@
 use strict;
 use warnings;
 
-use IcingaAlert;
-use HostIcingaAlert;
 package IcingaBot;
 use base qw( Bot::BasicBot );
 use utf8;
 use feature qw(switch);
+use File::Copy;
 
 ##################
 # Some variables #
@@ -31,6 +30,11 @@ my $username = 'Icinga';
 # Tableau utilisé pour stocker le contenu du fichier
 my @icingaAlerts = ();
 
+#Fichier utilisé pour transmettre des commandes au bot
+my $inputFile = '/tmp/icingaBot';
+my $fileSuffix = '.tmp';
+my $copyFile = $inputFile.$fileSuffix;
+
 ####################################
 # Overriding Bot::BasicBot methods #
 ####################################
@@ -39,7 +43,7 @@ sub connected {
         my ($self) = @_;
         $self->say(
                 channel=>$channel,
-                body=>"IcingaBot, version: $verseion",
+                body=>"IcingaBot, version: $version",
                 );
 }
 
@@ -49,12 +53,30 @@ sub tick {
                 channel=>$channel,
                 body=>"I'am still here !",
         );
-        return 5*60;
+        return 5; # This method will be re-executed in 5 second
 }
 
-#######################
-# Launching IcingaBot #
-#######################
+################
+# Coeur du Bot #
+################
+
+sub readInputFile {
+        move($inputFile, $copyFile) or die "Move failed!"; 
+        open(FILE, '<:encoding(UTF-8)', $copyFile)
+          or die "Couldn't open file $inputFile !";
+
+        while (my $line = <FILE>) {
+                
+        }
+
+        close FILE
+          or warn $! ? "Error closing sort pipe: $!"
+                : "Exit status $? from sort";        
+}
+
+#########################
+# Lancement d'IcingaBot #
+#########################
 
 
 my $bot = IcingaBot->new(
@@ -67,4 +89,6 @@ my $bot = IcingaBot->new(
     username  => $ircname,
     name      => $username,
 );
+
 $bot->run();
+
