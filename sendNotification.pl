@@ -24,8 +24,8 @@ if (defined($opt_M)) {
 }
 
 
-open (my $fh, '>', $file) or die "Could not open file $file";
-print $fh $message;
+open (my $fh, '>>', $file) or die "Could not open file $file";
+print $fh "$message\n";
 close $fh;
 1;
 
