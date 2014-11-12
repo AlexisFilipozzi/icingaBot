@@ -12,6 +12,8 @@ use base qw( Bot::BasicBot );
 use utf8;
 use feature qw(switch);
 use File::Copy;
+use Switch;
+use Term::ANSIColor qw(:constants);
 
 ##################
 # Some variables #
@@ -83,49 +85,49 @@ sub readInputFile {
 sub displayAlerts {
         my ($self) = @_;
         while(defined(my $alert=shift(@icingaAlerts))) {
+                my $message = $self->colorize($alert);
                 $self->say(
                         channel=>$self->{channels}[0],
-                        body=>$alert,
+                        body=>$message,
                         );
         }
 }
 
 sub colorize {
         my ($self, $message) = @_;
-        my @words = split / /, $message;i
-        my $color;
-        my $defaultColor = "\033[0m";
-        my $colorNumber;
+        my @words = split / /, $message;
+        my $color = "";
+        my $defaultColor = RESET;
+        my$state = "";
         #Notification Type
-        $notificationType = shift @words;
+        my $notificationType = shift @words;
         switch ($notificationType) {
-                case "PROBLEM:"                 {$colorNumber = "31";}
-                case "RECOVERY:"                {$colorNumber = "32";}
-                case "ACKNOWLEDGEMENT:"         {$colorNumber = "34";}
-                case "FLAPPINGSTART:"           {$colorNumber = "33";}
-                case "FLAPPINGSTOP:"            {$colorNumber = "32";}
-                case "FLAPPINGDISABLED:"        {$colorNumber = "34";}
-                case "DOWNTIMESTART:"           {$colorNumber = "34";}
-                case "DOWNTIMEEND:"             {$colorNumber = "34";}
-                case "DOWNTIMECANCELLED:"       {$colorNumber = "34";}
-                else                            {$colorNumber = "0";}
+                case "PROBLEM:"                 {$color = RED}
+                case "RECOVERY:"                {$color = GREEN}
+                case "ACKNOWLEDGEMENT:"         {$color = BLUE}
+                case "FLAPPINGSTART:"           {$color = RED}
+                case "FLAPPINGSTOP:"            {$color = GREEN}
+                case "FLAPPINGDISABLED:"        {$color = BLUE}
+                case "DOWNTIMESTART:"           {$color = BLUE}
+                case "DOWNTIMEEND:"             {$color = BLUE}
+                case "DOWNTIMECANCELLED:"       {$color = BLUE}
+                else                            {$color = RESET}
         }
-        $color = '\033['.$colorNumber.'m';
         $message = $color.$notificationType.$defaultColor.' ';
-        for (my $i=0; $i <= $#words; i++) {
+        for (my $i=0; $i <= $#words; $i++) {
                 $message = $message.(shift @words).' ';
         }        
         #Host/Service State
         $state = shift @words;
         switch ($state) {
-                case "OK"       {$colorNumber = "32";}     
-                case "WARNING"  {$colorNumber = "33";}
-                case "CRITICAL" {$colorNumber = "31";}
-                case "UNKNOWN"  {$colorNumber = "35";}
-                case "UP"       {$colorNumber = "32";}
-                case "DOWN"     {$colorNumber = "31";}
+                case "OK\n"       {$color = GREEN}     
+                case "WARNING\n"  {$color = YELLOW}
+                case "CRITICAL\n" {$color = RED}
+                case "UNKNOWN\n"  {$color = MAGENTA}
+                case "UP\n"       {$color = GREEN}
+                case "DOWN\n"     {$color = RED}
+                else              {$color = RESET}
         }
-        $color = '\033['.$colorNumber.'m';
-        $message = $message.$color.$state.$defaultColor;
+        $message = $message.$color.$state;
         return $message;
 }
