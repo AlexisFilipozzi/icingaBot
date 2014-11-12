@@ -90,3 +90,42 @@ sub displayAlerts {
         }
 }
 
+sub colorize {
+        my ($self, $message) = @_;
+        my @words = split / /, $message;i
+        my $color;
+        my $defaultColor = "\033[0m";
+        my $colorNumber;
+        #Notification Type
+        $notificationType = shift @words;
+        switch ($notificationType) {
+                case "PROBLEM:"                 {$colorNumber = "31";}
+                case "RECOVERY:"                {$colorNumber = "32";}
+                case "ACKNOWLEDGEMENT:"         {$colorNumber = "34";}
+                case "FLAPPINGSTART:"           {$colorNumber = "33";}
+                case "FLAPPINGSTOP:"            {$colorNumber = "32";}
+                case "FLAPPINGDISABLED:"        {$colorNumber = "34";}
+                case "DOWNTIMESTART:"           {$colorNumber = "34";}
+                case "DOWNTIMEEND:"             {$colorNumber = "34";}
+                case "DOWNTIMECANCELLED:"       {$colorNumber = "34";}
+                else                            {$colorNumber = "0";}
+        }
+        $color = '\033['.$colorNumber.'m';
+        $message = $color.$notificationType.$defaultColor.' ';
+        for (my $i=0; $i <= $#words; i++) {
+                $message = $message.(shift @words).' ';
+        }        
+        #Host/Service State
+        $state = shift @words;
+        switch ($state) {
+                case "OK"       {$colorNumber = "32";}     
+                case "WARNING"  {$colorNumber = "33";}
+                case "CRITICAL" {$colorNumber = "31";}
+                case "UNKNOWN"  {$colorNumber = "35";}
+                case "UP"       {$colorNumber = "32";}
+                case "DOWN"     {$colorNumber = "31";}
+        }
+        $color = '\033['.$colorNumber.'m';
+        $message = $message.$color.$state.$defaultColor;
+        return $message;
+}
