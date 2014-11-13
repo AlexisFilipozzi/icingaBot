@@ -14,6 +14,13 @@ use feature qw(switch);
 use File::Copy;
 use Switch;
 use Term::ANSIColor qw(:constants);
+use AnyEvent::HTTPD;
+use threads;
+use Config;
+
+# IcingaBot a besoin des threads pour lancer un serveur HTTP
+$Config{useithreads} or die
+      "Recompilez Perl avec les threads activés pour faire tourner ce programme.";
 
 ##################
 # Some variables #
@@ -41,12 +48,43 @@ our @ISA = ("Bot::BasicBot");
 sub new {
         my ($class, %table) = @_;
         my $self = $class->SUPER::new(%table);
+        $self->{httpd} = AnyEvent::HTTPD->new(
+                port => $table{portIcinga}||9000,
+                host => '0.0.0.0',
+                request_timeout => 30,
+                allowed_methods => ['GET', 'POST'],
+        );
+        $self->{httpd}->reg_cb (
+                '/icingabot'=> sub {
+                        my ($httpd, $req) = @_;
+                        my %vars = $req->vars;
+                        unless($req->method eq 'POST' && defined($vars{message}) && $self->check_client($req)) {
+                                $req->respond([400, 'bad request', {}, '']);
+                        } else {
+                                push(@icingaAlerts, $vars{message});
+                        }
+                        $req->respond([200, 'ok', {'Content-Type' => 'text/html'}, 'Message added to the queue']);
+                        $httpd->stop_request;
+                }
+        );
+        $self->{allowed_ips} = $table{allowed_ips};
         bless ($self, $class);
         return $self;
 }
 
+sub check_client {
+        my ($self, $req) = @_;
+        unless ($req->client_host ~~ $self->{allowed_ips}) {
+                $req->respond([403, 'Forbidden', {}, '']);
+                $self->{httpd}->stop_request;
+                return 0;
+        }
+        return 1;
+}
+
 sub connected {
         my ($self) = @_;
+        threads->create('startHTTP', $self);
         $self->say(
                 channel=>$self->{channels}[0],
                 body=>"IcingaBot, version: $version",
@@ -58,6 +96,11 @@ sub tick {
         $self->readInputFile();
         $self->displayAlerts();
         return $refresh; # This method will be re-executed in $refresh second
+}
+
+sub startHTTP {
+        my ($self) = @_;
+        $self->{httpd}->run();
 }
 
 ################
@@ -113,18 +156,19 @@ sub colorize {
                 else                            {$color = RESET}
         }
         $message = $color.$notificationType.$defaultColor.' ';
-        while ($#words != 0) {
+        while (@words && $#words != 0) {
                 $message = $message.(shift @words).' ';
         }        
         #Host/Service State
-        $state = shift @words;
+        $state = shift @words || '';
+        $state =~ s/\n//g;
         switch ($state) {
-                case "OK\n"       {$color = GREEN}     
-                case "WARNING\n"  {$color = YELLOW}
-                case "CRITICAL\n" {$color = RED}
-                case "UNKNOWN\n"  {$color = MAGENTA}
-                case "UP\n"       {$color = GREEN}
-                case "DOWN\n"     {$color = RED}
+                case "OK"       {$color = GREEN}     
+                case "WARNING"  {$color = YELLOW}
+                case "CRITICAL" {$color = RED}
+                case "UNKNOWN"  {$color = MAGENTA}
+                case "UP"       {$color = GREEN}
+                case "DOWN"     {$color = RED}
                 else              {$color = RESET}
         }
         $message = $message.$color.$state;
