@@ -7,10 +7,10 @@ use IcingaBot;
 
 # Configuration de la connexion (serveur, login, channel)
 my $server = 'irc.viabile.via.ecp.fr';
-my $nick = 'Icinga';
-my $channel = '#icinga2-test';
-my $ircname = 'Icinga';
-my $username = 'Icinga';
+my $nick = 'IcingaBot';
+my $channel = '#icinga2';
+my $ircname = 'IcingaBot';
+my $username = 'IcingaBot';
 
 my $bot = IcingaBot->new(
     server    => $server,

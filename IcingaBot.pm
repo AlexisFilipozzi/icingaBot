@@ -39,8 +39,8 @@ my@icingaAlerts;
 our @ISA = ("Bot::BasicBot");
 
 sub new {
-          my ($class, %table) = @_;
-          my $self = $class->SUPER::new(%table);
+        my ($class, %table) = @_;
+        my $self = $class->SUPER::new(%table);
         bless ($self, $class);
         return $self;
 }
@@ -85,10 +85,9 @@ sub readInputFile {
 sub displayAlerts {
         my ($self) = @_;
         while(defined(my $alert=shift(@icingaAlerts))) {
-                my $message = $self->colorize($alert);
                 $self->say(
                         channel=>$self->{channels}[0],
-                        body=>$message,
+                        body=>$self->colorize($alert),
                         );
         }
 }
@@ -105,16 +104,16 @@ sub colorize {
                 case "PROBLEM:"                 {$color = RED}
                 case "RECOVERY:"                {$color = GREEN}
                 case "ACKNOWLEDGEMENT:"         {$color = BLUE}
-                case "FLAPPINGSTART:"           {$color = RED}
-                case "FLAPPINGSTOP:"            {$color = GREEN}
-                case "FLAPPINGDISABLED:"        {$color = BLUE}
-                case "DOWNTIMESTART:"           {$color = BLUE}
+                case "FLAPPINGSTART:"           {$color = YELLOW}
+                case "FLAPPINGSTOP:"            {$color = MAGENTA}
+                case "FLAPPINGEND:"             {$color = CYAN}
+                case "DOWNTIMESTART:"           {$color = CYAN}
                 case "DOWNTIMEEND:"             {$color = BLUE}
                 case "DOWNTIMECANCELLED:"       {$color = BLUE}
                 else                            {$color = RESET}
         }
         $message = $color.$notificationType.$defaultColor.' ';
-        for (my $i=0; $i <= $#words; $i++) {
+        while ($#words != 0) {
                 $message = $message.(shift @words).' ';
         }        
         #Host/Service State
