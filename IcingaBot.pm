@@ -29,11 +29,6 @@ $Config{useithreads} or die
 # Version
 my $version = 0.1;
 
-#Fichier utilisé pour transmettre des commandes au bot
-my $inputFile = '/tmp/icingaBot';
-my $fileSuffix = '.tmp';
-my $copyFile = $inputFile.$fileSuffix;
-
 # Nombre de seconde pour actualiser les alertes
 my $refresh = 5;
 
@@ -93,7 +88,6 @@ sub connected {
 
 sub tick {
         my ($self) = @_;
-        $self->readInputFile();
         $self->displayAlerts();
         return $refresh; # This method will be re-executed in $refresh second
 }
@@ -106,24 +100,6 @@ sub startHTTP {
 ################
 # Coeur du Bot #
 ################
-
-sub readInputFile {
-        my ($self) = @_;
-        if (-e $inputFile) {
-                move($inputFile, $copyFile) or die "Move failed!"; 
-                open(FILE, '<:encoding(UTF-8)', $copyFile)
-                 or die "Couldn't open file $copyFile !";
-
-                while (my $line = <FILE>) {
-                        push(@icingaAlerts, $line);
-                }
-
-                close FILE
-                   or warn $! ? "Error closing sort pipe: $!"
-                        : "Exit status $? from sort";
-                unlink $copyFile;
-        }
-}
 
 sub displayAlerts {
         my ($self) = @_;
