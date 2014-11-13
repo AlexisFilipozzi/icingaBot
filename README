@@ -1,1 +1,6 @@
-Bot de notification par IRC des alertes Icinga
+Bot de notification par IRC des alertes Icinga.
+
+Le bot contient un serveur HTTP qui reçoit les notifications d'Icinga.
+Il faut rajouter l'IP de (ou des) machines Icinga dans allowed_ips.
+
+Le bot permet aussi de colorier les messages sur IRC.
