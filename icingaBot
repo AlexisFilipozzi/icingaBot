@@ -7,8 +7,7 @@ start() {
    pid=$(ps aux | grep icingabot.pl | grep -v grep | tr -s ' ' | cut -d' ' -f2)
    if [ "$pid" = "" ]; then
         echo "Launching Icingabot"
-        cd $icingabotDirectory
-        perl icingabot.pl > /dev/null 2>&1 &
+        cd $icingabotDirectory && $icingabotDirectory/launchIcingaBot.sh > /dev/null 2>&1 &
    else 
         echo "Icingabot is already started"
    fi

@@ -26,7 +26,7 @@ $Config{useithreads} or die
 ##################
 
 # Version
-my $version = 0.1;
+my $version = 0.2;
 
 # Nombre de seconde pour actualiser les alertes
 my $refresh = 5;
@@ -79,10 +79,12 @@ sub check_client {
 sub connected {
         my ($self) = @_;
         threads->create('startHTTP', $self);
-        $self->say(
-                channel=>$self->{channels}[0],
-                body=>"IcingaBot, version: $version",
-                );
+        foreach my $channel ($self->channels) {
+                $self->notice(
+                        channel=>$channel,
+                        body=>"IcingaBot, version: $version",
+                        );
+        }
 }
 
 sub tick {
@@ -103,10 +105,12 @@ sub startHTTP {
 sub displayAlerts {
         my ($self) = @_;
         while(defined(my $alert=shift(@icingaAlerts))) {
-                $self->say(
-                        channel=>$self->{channels}[0],
-                        body=>$self->colorize($alert),
-                        );
+                foreach my $channel ($self->channels) {
+                        $self->notice(
+                                channel=>$channel,
+                                body=>$self->colorize($alert),
+                                );
+                }
         }
 }
 
