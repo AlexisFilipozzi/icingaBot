@@ -4,3 +4,9 @@ Le bot contient un serveur HTTP qui reçoit les notifications d'Icinga.
 Il faut rajouter l'IP de (ou des) machines Icinga dans allowed_ips.
 
 Le bot permet aussi de colorier les messages sur IRC.
+
+Il faut généralement installé les librairies perl suivantes (avec cpan) :
+ Bot::BasicBot
+ AnyEvent::HTTPD
+ POE::Component::SSLify
+
