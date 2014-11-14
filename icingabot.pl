@@ -31,5 +31,6 @@ my $bot = IcingaBot->new(
                     '2002:8ac3:802d:1243:5054:ff:feff:93a0', #Staross
                    ],
 );
-
-$bot->run();
+while(1) {
+  $bot->run();
+}
