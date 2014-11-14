@@ -11,7 +11,6 @@ package IcingaBot;
 use base qw( Bot::BasicBot );
 use utf8;
 use feature qw(switch);
-use File::Copy;
 use Switch;
 use Term::ANSIColor qw(:constants);
 use AnyEvent::HTTPD;
