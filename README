@@ -10,3 +10,4 @@ Il faut généralement installé les librairies perl suivantes (avec cpan) :
  AnyEvent::HTTPD
  POE::Component::SSLify
 
+Le fichier send_irc_notification.pl permet à Icinga d'envoyer des notifications à Icingabot.
