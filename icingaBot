@@ -4,7 +4,7 @@ PATH=/sbin:/bin:/usr/sbin:/usr/bin
 icingabotDirectory="/usr/local/icingaBot"
 
 start() {
-   pid=$(ps aux | grep icingabot.pl | grep -v grep | tr -s ' ' | cut -d' ' -f2)
+   pid=$(ps aux | egrep '(icingabot.pl)|(launchIcingaBot.sh)' | grep -v grep | tr -s ' ' | cut -d' ' -f2 | tr '\n' ' ')
    if [ "$pid" = "" ]; then
         echo "Launching Icingabot"
         cd $icingabotDirectory && $icingabotDirectory/launchIcingaBot.sh > /dev/null 2>&1 &
@@ -15,13 +15,15 @@ start() {
 
 stop() {
    echo "Stoping IcingaBot"
-   pid=$(ps aux | grep icingabot.pl | grep -v grep | tr -s ' ' | cut -d' ' -f2)
+   pid=$(ps aux | egrep '(icingabot.pl)|(launchIcingaBot.sh)' | grep -v grep | tr -s ' ' | cut -d' ' -f2 | tr '\n' ' ')
    if [ "$pid" = "" ]; then
         echo "Icingabot was already stopped"
    else
-        echo "Killing PID: $pid"
-        kill -9 $pid
-        echo "Done"
+        for i in $pid; do
+                echo "Killing PID: $i"
+                kill -9 $i
+                echo "Done"
+        done
    fi
 }
 
@@ -32,7 +34,7 @@ restart() {
 }
 
 status() {
-   pid=$(ps aux | grep icingabot.pl | grep -v grep | tr -s ' ' | cut -d' ' -f2)
+   pid=$(ps aux | egrep '(icingabot.pl)|(launchIcingaBot.sh)' | grep -v grep | tr -s ' ' | cut -d' ' -f2 | tr '\n' ' ')
    if [ "$pid" = "" ]; then
         echo "Icingabot is not running"
    else
