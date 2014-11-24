@@ -79,12 +79,6 @@ sub check_client {
 sub connected {
         my ($self) = @_;
         threads->create('startHTTP', $self);
-        foreach my $channel ($self->channels) {
-                $self->notice(
-                        channel=>$channel,
-                        body=>"IcingaBot, version: $version",
-                        );
-        }
 }
 
 sub tick {
